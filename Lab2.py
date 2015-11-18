@@ -1228,20 +1228,27 @@ def lp3(c0 = 0, ca= 10, m2= 1.0, doit=0):
 #_________________________________________________________________________
 def lp2(c0 = 0, ca= 10, m2= 1.0, doit=0):
 
-    ac =TH1F( "ac", "ac", (ca-c0), c0/m2, ca/m2)#, 500, -200, 0)
+    ac =TH1D( "ac", "ac", (ca-c0), c0/m2, ca/m2)#, 500, -200, 0)
+    dd =TH1D( "dd", "dd", (ca-c0), c0/m2, ca/m2)#, 500, -200, 0)
     temp2 = -9999.
     binsaved2 = 0
-    for x in range (c0, ca):
+    for x in range (c0, ca+1):
         a2 = 1.0*x/m2
         ff = "(%f) + %f*exp( - (x-%f)*(x-%f)/(2*(%f)*(%f)))"%(p0, p1, a2, a2, p3, p3)
         func = TF1("func", ff, 0, 50)
         sum2 = 0.0      
         for i in range (1, 51):
-            sum2 = sum2 + (h.GetBinContent(i))*log(func.Eval(i, 0, 0)) - func.Eval(i, 0, 0) - log( Factorial( h.GetBinContent(i)))
+
+            data_1 = h.GetBinContent(i)
+            if x > 51:
+                data_1 = 0
+            
+            sum2 = sum2 + (data_1)*log(func.Eval(i, 0, 0)) - func.Eval(i, 0, 0) - log( Factorial(data_1))
         if abs(sum2) < abs(temp2):
             temp2 = sum2
             binsaved2 = x/m2
-        ac.SetBinContent(x-c0, sum2)
+        #ac.SetBinContent(x-c0, sum2)
+        ac.SetBinContent(x-c0, (sum2))
         #ac.Fill(a2, sum2)
     #print "Chi square min for p2: ",temp2
     #print " value of p2: ",binsaved2
@@ -1303,8 +1310,8 @@ def lp2(c0 = 0, ca= 10, m2= 1.0, doit=0):
     text.Draw("same")
 
 
-    errm.DrawMarker(binerr, sumaa)
-    errm.DrawMarker(binerrup, sumaaup)
+    #errm.DrawMarker(binerr, sumaa)
+    #errm.DrawMarker(binerrup, sumaaup)
                     
     if doit == 1:
         text2 = TLatex(binsaved2*0.75, 2.9*temp2, " \Delta p_{<} = %.2f "%abs(binerr-binsaved2))
@@ -1778,8 +1785,8 @@ lp3(4000, 6000, 1000.,1)
 
 #lp0(0, 3000, 100.,1)
 #lp1(0, 7000, 100.,1)
-#lp2(0, 7000, 100.,1)
-lp3(0, 700000, 1.,1)
+lp2(0, 700, 10.,0 )
+#lp3(0, 700000, 1.,1)
 
 #######################################################################
 
